@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # Run with nginx for deployment
+  nginx:
+    build:
+      context: ./app
+    ports:
+      - '${FRONTEND_PORT:-3000}:80'
+
+  # Run with node for development
+  app:
+    image: node:15
+    ports:
+      - '${FRONTEND_PORT:-3000}:3000'
+    volumes:
+      - ./app/node_modules:/usr/src/app/node_modules:cached
+      - ./app/package.json:/usr/src/app/package.json:delegated
+      - ./app/package-lock.json:/usr/src/app/package-lock.json:delegated
+      - ./app/public:/usr/src/app/public:delegated
+      - ./app/src:/usr/src/app/src:delegated
+    environment:
+      # reactjs uses Chokidar (file watching lib) to watch file changes and reload automatically the app
+      CHOKIDAR_USEPOLLING: 'true'
+    working_dir: /usr/src/app
+    entrypoint: ['npm', 'run', 'start:compose']

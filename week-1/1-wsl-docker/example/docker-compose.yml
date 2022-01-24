@@ -1,0 +1,49 @@
+version: '3.8' # docker-compose version
+
+services:
+  app:
+    build:
+      context: ./app # builds the Dockerfile from this folder
+    ports: # expose these ports
+      - '8080:8080'
+    environment: # declare environment variables
+      NODE_ENV: development
+
+  frontend:
+    image: node:16 # run an image from the docker hub
+    ports:
+      - '${FRONTEND_PORT:-3000}:3000' # if you want to change the frontend port, use the .env file
+    volumes: # declare volumes
+      - ./.docker-data/frontend/node_modules:/usr/src/app/node_modules:cached
+      - ./frontend/package.json:/usr/src/app/package.json:delegated
+      - ./frontend/package-lock.json:/usr/src/app/package-lock.json:delegated
+      - ./frontend/public:/usr/src/app/public:delegated
+      - ./frontend/src:/usr/src/app/src:delegated
+    working_dir: /usr/src/app
+    entrypoint: ['npm', 'run', 'start:compose'] # first command to be executed
+    depends_on:
+      app:
+        condition: service_started
+
+  postgres:
+    image: postgres:13.2
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - ./.docker-data/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 60
+
+  adminer:
+    image: adminer:4.8.0
+    restart: always
+    depends_on: # declare which services must be started before this one
+      postgres:
+        condition: service_healthy
+    ports:
+      - '${ADMINER_PORT:-8081}:8080'

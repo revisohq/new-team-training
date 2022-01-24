@@ -1,0 +1,82 @@
+# This example builds the .NET Core and Node.js apps as Docker images to an Azure Container Registry
+# and deploys them to CapRover, each in their test or production environments, based on which branch is updated
+
+# For example, the job 'build_netcoreapp' is triggered every time a commit in 'development' or 'master' is pushed
+# but the 'deploy_dev_netcoreapp' job is executed only if the commit is in the 'development' branch
+# on the other hand, the 'deploy_prod_netcoreapp' job is executed only if the commit is in the 'master' branch
+
+# The scripts are grouped into jobs, and jobs run as part of a larger pipeline.
+# You can group multiple jobs into stages that run in a defined order
+stages:
+  - build
+  - deploy
+
+#
+# BUILD
+#
+
+build_netcoreapp:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: ['']
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"https://${AZURE_REGISTRY_URL}\":{\"username\":\"${AZURE_REGISTRY_USER}\",\"password\":\"${AZURE_REGISTRY_PASSWORD}\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context ${CI_PROJECT_DIR}/netcoreapp --dockerfile ${CI_PROJECT_DIR}/netcoreapp/Dockerfile --build-arg NUGET_EXTERNAL_FEED_EMAIL=${AZURE_DEVOPS_NUGET_EMAIL} --build-arg NUGET_EXTERNAL_FEED_PAT=${AZURE_DEVOPS_NUGET_TOKEN} --build-arg ECIDEBITOOR_NUGET_AUTH=${ECIDEBITOOR_NUGET_AUTH} --destination ${AZURE_REGISTRY_URL}/${CI_PROJECT_NAME}-netcoreapp:${CI_COMMIT_SHA}
+  only:
+    - development
+    - master
+
+build_nodejsapp:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: ['']
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"https://${AZURE_REGISTRY_URL}\":{\"username\":\"${AZURE_REGISTRY_USER}\",\"password\":\"${AZURE_REGISTRY_PASSWORD}\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context ${CI_PROJECT_DIR}/nodejsapp --dockerfile ${CI_PROJECT_DIR}/nodejsapp/Dockerfile --destination ${AZURE_REGISTRY_URL}/${CI_PROJECT_NAME}-nodejsapp:${CI_COMMIT_SHA}
+  only:
+    - development
+    - master
+
+#
+# DEPLOY
+#
+
+deploy_dev_netcoreapp:
+  stage: deploy
+  image: node:15.8
+  script:
+    - npm install -g caprover
+    - caprover deploy --caproverUrl ${ROVER001D_URL} --caproverPassword ${ROVER001D_PASSWORD} --caproverApp ${CI_PROJECT_NAME}-netcoreapp --imageName ${AZURE_REGISTRY_URL}/${CI_PROJECT_NAME}-netcoreapp:${CI_COMMIT_SHA}
+  only:
+    - development
+
+deploy_dev_nodejsapp:
+  stage: deploy
+  image: node:15.8
+  script:
+    - npm install -g caprover
+    - caprover deploy --caproverUrl ${ROVER001D_URL} --caproverPassword ${ROVER001D_PASSWORD} --caproverApp ${CI_PROJECT_NAME}-nodejsapp --imageName ${AZURE_REGISTRY_URL}/${CI_PROJECT_NAME}-nodejsapp:${CI_COMMIT_SHA}
+  only:
+    - development
+
+deploy_prod_netcoreapp:
+  stage: deploy
+  image: node:15.8
+  script:
+    - npm install -g caprover
+    - caprover deploy --caproverUrl ${ROVER001P_URL} --caproverPassword ${ROVER001P_PASSWORD} --caproverApp ${CI_PROJECT_NAME}-netcoreapp --imageName ${AZURE_REGISTRY_URL}/${CI_PROJECT_NAME}-netcoreapp:${CI_COMMIT_SHA}
+  only:
+    - master
+
+deploy_prod_nodejsapp:
+  stage: deploy
+  image: node:15.8
+  script:
+    - npm install -g caprover
+    - caprover deploy --caproverUrl ${ROVER001P_URL} --caproverPassword ${ROVER001P_PASSWORD} --caproverApp ${CI_PROJECT_NAME}-nodejsapp --imageName ${AZURE_REGISTRY_URL}/${CI_PROJECT_NAME}-nodejsapp:${CI_COMMIT_SHA}
+  only:
+    - master
