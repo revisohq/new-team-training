@@ -98,7 +98,7 @@ https://hasura.io/docs/latest/graphql/core/hasura-cli/install-hasura-cli.html#in
 
 - More on hasura CLI<br> https://hasura.io/docs/latest/graphql/core/hasura-cli/index.html
 
-- How to setup migrations: https://hasura.io/docs/latest/graphql/core/migrations/migrations-setup.html#step-3-initialize-the-migrations-and-metadata-as-per-your-current-stateù
+- How to setup migrations: https://hasura.io/docs/latest/graphql/core/migrations/migrations-setup.html#step-3-initialize-the-migrations-and-metadata-as-per-your-current-state
 
 `cd services`
 
