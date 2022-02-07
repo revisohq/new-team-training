@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "npm run test:unit && npm run test:e2e"
+    "start": "./node_modules/.bin/nodemon -L ./src/index.js",
+    "___// Testing Utilities //___": "",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:e2e": "./node_modules/.bin/jest --projects test/templates/e2e --runInBand --testTimeout=10000",
+    "test:unit": "./node_modules/.bin/jest --projects test/templates/unit",
+    "tdd:e2e": "./node_modules/.bin/jest --projects test/templates/e2e --runInBand --watchAll --testTimeout=10000",
+    "tdd:unit": "jest --projects test/templates/unit --watchAll"
   },
   "author": "",
   "license": "ISC",
