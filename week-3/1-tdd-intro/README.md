@@ -60,7 +60,7 @@ The most famous tool to perform e2e testing is [Postman][postman], which has a b
 
 Similar to E2E test, but in case of a multi-service application the services are tested together. In a monolithic application, e2e and integration tests are the same thing.
 
-Pros an Cons are like e2e testing.
+Pros and Cons are like e2e testing.
 
 ### Penetration Test
 
@@ -68,13 +68,13 @@ This type of tests are performed to ensure the security of our system. They can 
 
 There is a dedicated team in our company that does this.
 
-Some companies, like [Google][google-bug-hunters], even do _Bug Bounty programs_, in which they offer recognition and compensation to external delevopers or ethical hackers for reporting bugs regarding security exploits and vulnerabilities.
+Some companies, like [Google][google-bug-hunters], even do _Bug Bounty programs_, in which they offer recognition and compensation to external developers or ethical hackers for reporting bugs regarding security exploits and vulnerabilities.
 
 ### Stress Test
 
-Stess tests try to find out what happens to the application in edge cases.
+Stress tests try to find out what happens to the application in edge cases.
 
-Thera are two types or stess test:
+There are two types or stress test:
 
 - Database: _what happens if I try to add 100,000 rows in the database? Will it explode? Will it take forever?_
 - Networking: _what happens if I perform a million requests to my API in a short period of time?_
@@ -85,12 +85,25 @@ They are extremely valuable, but they're not cheap to implement.
 
 A famous tool to perform stress tests is [JMeter][jmeter].
 
+#### PROs
+
+- Extremely valuable, because it helps in the identification of performance bottlenecks before production deployment
+- It helps in configuring the most optimal infrastructure for the setup
+- It minimizes the risk of downtime by identifying and isolating the requests whose performance needs to be improved.
+- It provides a sense of confidence and reliability in the application's performance.
+
+#### CONs
+
+- Expensive in terms of testing tools licenses and test environments costs
+- Load test script creation requires scripting knowledge of the language supported by the tool.
+- Incorrectly configured or scripted load test plan/script can lead to false performance issues which take a considerable amount of time and resources.
+
 ### Regression Test
 
 [Regression testing][regression] is a practice that ensures an application still functions as expected after any code changes, updates, or improvements. Changes that may require regression testing include bug fixes, software enhancements, configuration changes, and even substitution of electronic components.
 They can be performed on one or multiple services at a time.
 
-In order to perform regression testing when an error occurs in an application, we should be able to revert the system back to before the error occured, and start from there to fix the issue (especially the database).
+In order to perform regression testing when an error occurs in an application, we should be able to revert the system back to before the error occurred, and start from there to fix the issue (especially the database).
 
 #### PROs
 
@@ -100,7 +113,7 @@ In order to perform regression testing when an error occurs in an application, w
 #### CONs
 
 - It's the most expensive type of test, also in terms of time (the database backups are time consuming)
-- Hard to mantain, expecially in case of database migrations
+- Hard to maintain, especially in case of database migrations
 
 # Test-driven development
 
